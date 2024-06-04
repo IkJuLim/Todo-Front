@@ -5,6 +5,7 @@ const ProfileForm = () => {
   const [name, setName] = useState('');
   const [nickName, setNickName] = useState('');
   const [age, setAge] = useState('');
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,8 +38,30 @@ const ProfileForm = () => {
     }
   };
 
+  const validateForm = () => {
+    const errors = {};
+    const namePattern = /^[A-Za-z가-힣]+$/;
+    const nickNamePattern = /^.{2,}$/;
+
+    if (!name || !namePattern.test(name)) {
+      errors.name = "사용자 이름은 한글 또는 알파벳만 입력해주세요.";
+    }
+    if (!nickName || !nickNamePattern.test(nickName)) {
+      errors.nickName = "닉네임이 너무 짧습니다.";
+    }
+    if (age < 0 || age > 150) {
+      errors.age = "나이는 0에서 150 사이여야 합니다.";
+    }
+    return errors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
     const token = localStorage.getItem('accessToken');
     try {
       const response = await fetch('http://localhost:8080/api/member', {
@@ -67,7 +90,7 @@ const ProfileForm = () => {
         <h1 className="text-2xl font-semibold mb-4">프로필 수정</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="name" className="block text-gray-600">Name</label>
+            <label htmlFor="name" className="block text-gray-600">이름</label>
             <input
               type="text"
               id="name"
@@ -77,9 +100,10 @@ const ProfileForm = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
           </div>
           <div className="mb-4">
-            <label htmlFor="nickName" className="block text-gray-600">NickName</label>
+            <label htmlFor="nickName" className="block text-gray-600">닉네임</label>
             <input
               type="text"
               id="nickName"
@@ -89,9 +113,10 @@ const ProfileForm = () => {
               value={nickName}
               onChange={(e) => setNickName(e.target.value)}
             />
+            {errors.nickName && <p className="text-red-500 text-sm">{errors.nickName}</p>}
           </div>
           <div className="mb-4">
-            <label htmlFor="age" className="block text-gray-600">Age</label>
+            <label htmlFor="age" className="block text-gray-600">나이</label>
             <input
               type="number"
               id="age"
@@ -101,6 +126,7 @@ const ProfileForm = () => {
               value={age}
               onChange={(e) => setAge(e.target.value)}
             />
+            {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
           </div>
           <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">
             프로필 업데이트

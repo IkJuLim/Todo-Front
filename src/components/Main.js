@@ -16,6 +16,9 @@ const Main = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [profile, setProfile] = useState({});
+  const [pageSize, setPageSize] = useState(5);
+  const [totalSize, setTotalSize] = useState();
+  const [sorteBy, setSorteBy] = useState("Decrease : Create At");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,11 +30,12 @@ const Main = () => {
     } else {
       setIsAuthenticated(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const fetchTodos = async (token) => {
     try {
-      const response = await fetch('http://localhost:8080/api/todo/all', {
+      const response = await fetch('http://localhost:8080/api/todo/all?orderBy=' + sorteBy, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -39,6 +43,27 @@ const Main = () => {
       const data = await response.json();
       if (data.isSuccess) {
         setItems(data.result.todoList);
+        setTotalSize(data.result.size);
+      } else {
+        alert('Todo 조회 실패');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleTodoList = async () => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      const response = await fetch('http://localhost:8080/api/todo/all?orderBy=' + sorteBy, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (data.isSuccess) {
+        setItems(data.result.todoList);
+        setTotalSize(data.result.size);
       } else {
         alert('Todo 조회 실패');
       }
@@ -77,6 +102,11 @@ const Main = () => {
     setNewItem({ ...newItem, [name]: value });
   };
 
+  const handleSortByChange = (sortType) => {
+    setSorteBy(sortType);
+    handleTodoList();
+  };
+
   const handleAddItem = async () => {
     const token = localStorage.getItem('accessToken');
     const newItemWithDate = { ...newItem, status: false };
@@ -94,6 +124,7 @@ const Main = () => {
         setItems([...items, data.result]);
         setNewItem({ title: '', dueDate: '' });
         setIsModalOpen(false);
+        setTotalSize(totalSize+1);
       } else {
         alert('Todo 추가 실패');
       }
@@ -121,7 +152,7 @@ const Main = () => {
         setItems(updatedItems);
         setNewItem({ title: '', dueDate: '' });
         setIsModalOpen(false);
-        window.location.reload();
+        handleTodoList();
       } else {
         alert('Todo 수정 실패');
       }
@@ -143,6 +174,7 @@ const Main = () => {
       if (data.isSuccess) {
         const filteredItems = items.filter((item) => item.id !== id);
         setItems(filteredItems);
+        setTotalSize(totalSize-1);
       } else {
         alert('Todo 삭제 실패');
       }
@@ -210,6 +242,7 @@ const Main = () => {
       const data = await response.json();
       if (data.isSuccess) {
         setItems([]);
+        setTotalSize(0)
       } else {
         alert('Todo 상태 변경 실패');
       }
@@ -305,6 +338,12 @@ const Main = () => {
           />
           {isAuthenticated && (
             <TodoList
+              pageSize={pageSize}
+              setPageSize={setPageSize}
+              totalSize={totalSize}
+              sorteBy={sorteBy}
+              setSorteBy={setSorteBy}
+              handleSortByChange={handleSortByChange}
               items={items}
               handleEditClick={handleEditClick}
               handleDeleteItem={handleDeleteItem}
