@@ -1,20 +1,23 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import CalendarPage from './pages/CalendarPage';
-import ProtectedRoute from './components/ProtectedRoute';
+import LoginForm from './components/LoginForm';
+import RegisterForm from './components/RegisterForm';
+import Main from './components/Main';
+import ProfileForm from './components/ProfileForm';
+import PasswordForm from './components/PasswordForm';
 
-const App = () => {
+function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-        <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
+        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/" element={<Main />} />
+        <Route path="/edit-profile" element={<ProfileForm />} />
+        <Route path="/edit-password" element={<PasswordForm />} />
+        <Route path="/login" element={<LoginForm />} />
       </Routes>
     </Router>
   );
-};
+}
 
 export default App;
