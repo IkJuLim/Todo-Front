@@ -1,7 +1,6 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const ProfileModal = ({ isProfileModalOpen, handleProfileModalClose, profile, handleDeleteAccount }) => {
+const ProfileModal = ({ isProfileModalOpen, handleProfileModalClose, profile }) => {
   const navigate = useNavigate();
 
   if (!isProfileModalOpen) {
@@ -31,7 +30,7 @@ const ProfileModal = ({ isProfileModalOpen, handleProfileModalClose, profile, ha
             비밀번호 수정
           </button>
           <button 
-            onClick={handleDeleteAccount} 
+            onClick={() => navigate('/delete-account')} 
             className="bg-red-500 hover:bg-red-600 text-white font-semibold rounded-md py-2 px-4"
           >
             계정 삭제

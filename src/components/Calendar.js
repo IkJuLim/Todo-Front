@@ -1,8 +1,10 @@
+/* eslint-disable jsx-a11y/heading-has-content */
 import React, { useEffect } from 'react';
 
 const Calendar = ({ currentYear, currentMonth, setCurrentMonth, handleDateClick }) => {
   useEffect(() => {
     generateCalendar(currentYear, currentMonth);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentYear, currentMonth]);
 
   const generateCalendar = (year, month) => {

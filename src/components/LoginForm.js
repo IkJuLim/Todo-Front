@@ -9,7 +9,7 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8080/api/member/login', {
+      const response = await fetch( `${process.env.REACT_APP_BASE_URL}/api/member/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ const LoginForm = () => {
             <label htmlFor="remember" className="text-gray-600 ml-2">로그인 상태 유지</label>
           </div>
           <div className="mb-6 text-blue-500">
-            <a href="#" className="hover:underline">비밀번호 찾기</a>
+            {/* <a href="#" className="hover:underline">비밀번호 찾기</a> */}
           </div>
           <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">
             로그인

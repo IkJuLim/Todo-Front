@@ -12,13 +12,11 @@ const Main = () => {
   const [newItem, setNewItem] = useState({ title: '', dueDate: '' });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [currentYear] = useState(new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [profile, setProfile] = useState({});
-  const [pageSize, setPageSize] = useState(5);
-  const [totalSize, setTotalSize] = useState();
-  const [sorteBy, setSorteBy] = useState("Decrease : Create At");
+  const [sortBy, setSortBy] = useState("Decrease : Create At");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,12 +28,13 @@ const Main = () => {
     } else {
       setIsAuthenticated(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const fetchTodos = async (token) => {
+    const keyword = localStorage.getItem('keyword');
     try {
-      const response = await fetch('http://localhost:8080/api/todo/all?orderBy=' + sorteBy, {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/todo/all?orderBy=${sortBy}&keyword=${keyword}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -43,27 +42,6 @@ const Main = () => {
       const data = await response.json();
       if (data.isSuccess) {
         setItems(data.result.todoList);
-        setTotalSize(data.result.size);
-      } else {
-        alert('Todo 조회 실패');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
-  const handleTodoList = async () => {
-    const token = localStorage.getItem('accessToken');
-    try {
-      const response = await fetch('http://localhost:8080/api/todo/all?orderBy=' + sorteBy, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (data.isSuccess) {
-        setItems(data.result.todoList);
-        setTotalSize(data.result.size);
       } else {
         alert('Todo 조회 실패');
       }
@@ -74,7 +52,7 @@ const Main = () => {
 
   const fetchProfile = async (token) => {
     try {
-      const response = await fetch('http://localhost:8080/api/member', {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/member`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -102,16 +80,11 @@ const Main = () => {
     setNewItem({ ...newItem, [name]: value });
   };
 
-  const handleSortByChange = (sortType) => {
-    setSorteBy(sortType);
-    handleTodoList();
-  };
-
   const handleAddItem = async () => {
     const token = localStorage.getItem('accessToken');
     const newItemWithDate = { ...newItem, status: false };
     try {
-      const response = await fetch('http://localhost:8080/api/todo', {
+      const response = await fetch( `${process.env.REACT_APP_BASE_URL}/api/todo`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -124,7 +97,6 @@ const Main = () => {
         setItems([...items, data.result]);
         setNewItem({ title: '', dueDate: '' });
         setIsModalOpen(false);
-        setTotalSize(totalSize+1);
       } else {
         alert('Todo 추가 실패');
       }
@@ -136,7 +108,7 @@ const Main = () => {
   const handleUpdateItem = async () => {
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://localhost:8080/api/todo/${newItem.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/todo/${newItem.id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -146,13 +118,7 @@ const Main = () => {
       });
       const data = await response.json();
       if (data.isSuccess) {
-        const updatedItems = items.map((item) =>
-          item.id === newItem.id ? data.result : item
-        );
-        setItems(updatedItems);
-        setNewItem({ title: '', dueDate: '' });
-        setIsModalOpen(false);
-        handleTodoList();
+        window.location.reload();
       } else {
         alert('Todo 수정 실패');
       }
@@ -164,7 +130,7 @@ const Main = () => {
   const handleDeleteItem = async (id) => {
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://localhost:8080/api/todo/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/todo/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -174,7 +140,6 @@ const Main = () => {
       if (data.isSuccess) {
         const filteredItems = items.filter((item) => item.id !== id);
         setItems(filteredItems);
-        setTotalSize(totalSize-1);
       } else {
         alert('Todo 삭제 실패');
       }
@@ -185,6 +150,10 @@ const Main = () => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
+  };
+
+  const handleSortByChange = (sortType) => {
+    setSortBy(sortType);
   };
 
   const handleEditClick = (item) => {
@@ -204,27 +173,6 @@ const Main = () => {
     setIsProfileModalOpen(true);
   };
 
-  const handleDeleteAccount = async () => {
-    const token = localStorage.getItem('accessToken');
-    try {
-      const response = await fetch('http://localhost:8080/api/member', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (data.isSuccess) {
-        alert('회원 탈퇴 성공');
-        handleLogout();
-      } else {
-        alert('회원 탈퇴 실패');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
   const handleProfileModalClose = () => {
     setIsProfileModalOpen(false);
   };
@@ -232,7 +180,7 @@ const Main = () => {
   const handleDeleteAllClick = async () => {
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch(`http://localhost:8080/api/todo/all`, {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/todo/all`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -242,9 +190,30 @@ const Main = () => {
       const data = await response.json();
       if (data.isSuccess) {
         setItems([]);
-        setTotalSize(0)
       } else {
         alert('Todo 상태 변경 실패');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleSearchClick = async () => {
+    const token = localStorage.getItem('accessToken');
+    const keyword = localStorage.getItem('keyword'); // Refresh Token 저장
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/todo/all?orderBy=${sortBy}&keyword=${keyword}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      if (data.isSuccess) {
+        setItems(data.result.todoList);
+      } else {
+        alert('Todo 검색 실패');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -255,7 +224,7 @@ const Main = () => {
     const token = localStorage.getItem('accessToken');
     const item = items.find((item) => item.id === id);
     try {
-      const response = await fetch(`http://localhost:8080/api/todo/status/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/todo/status/${id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -310,7 +279,7 @@ const Main = () => {
           )}
         </div>
       </div>
-      <div className="flex flex-col items-center justify-center flex-grow pt-16">
+      <div className="flex flex-col items-center justify-center flex-grow pt-16 bg-gray-100">
         <div className="lg:w-7/12 md:w-9/12 sm:w-10/12 mx-auto p-4 overflow-y-auto">
           <WeatherCard />
           <Calendar 
@@ -334,20 +303,15 @@ const Main = () => {
             isProfileModalOpen={isProfileModalOpen}
             handleProfileModalClose={handleProfileModalClose}
             profile={profile}
-            handleDeleteAccount={handleDeleteAccount}
           />
           {isAuthenticated && (
             <TodoList
-              pageSize={pageSize}
-              setPageSize={setPageSize}
-              totalSize={totalSize}
-              sorteBy={sorteBy}
-              setSorteBy={setSorteBy}
-              handleSortByChange={handleSortByChange}
               items={items}
+              handleSortByChange={handleSortByChange}
               handleEditClick={handleEditClick}
               handleDeleteItem={handleDeleteItem}
               handleDeleteAllClick={handleDeleteAllClick}
+              handleSearchClick={handleSearchClick}
               checkboxEventHandler={checkboxEventHandler}
             />
           )}

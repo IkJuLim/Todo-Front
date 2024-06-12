@@ -40,7 +40,7 @@ const PasswordForm = () => {
     }
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch('http://localhost:8080/api/member/password', {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/member/password`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

@@ -5,16 +5,18 @@ import RegisterForm from './components/RegisterForm';
 import Main from './components/Main';
 import ProfileForm from './components/ProfileForm';
 import PasswordForm from './components/PasswordForm';
+import DeleteAccount from './components/DeleteAccount';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/register" element={<RegisterForm />} />
-        <Route path="/" element={<Main />} />
-        <Route path="/edit-profile" element={<ProfileForm />} />
-        <Route path="/edit-password" element={<PasswordForm />} />
-        <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/" element={<Main />} />
+          <Route path="/edit-profile" element={<ProfileForm />} />
+          <Route path="/edit-password" element={<PasswordForm />} />
+          <Route path="/delete-account" element={<DeleteAccount />} />
+          <Route path="/login" element={<LoginForm />} />
       </Routes>
     </Router>
   );

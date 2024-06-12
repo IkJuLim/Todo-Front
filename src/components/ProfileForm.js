@@ -19,7 +19,7 @@ const ProfileForm = () => {
 
   const fetchProfile = async (token) => {
     try {
-      const response = await fetch('http://localhost:8080/api/member', {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/member`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -64,7 +64,7 @@ const ProfileForm = () => {
     }
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await fetch('http://localhost:8080/api/member', {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/member`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

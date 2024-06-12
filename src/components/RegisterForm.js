@@ -43,7 +43,7 @@ const RegisterForm = () => {
       return;
     }
     try {
-      const response = await fetch('http://localhost:8080/api/member/join', {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/member/join`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
