@@ -5,4 +5,4 @@ RUN npm cache clear --force
 RUN npm install -verbose
 COPY . .
 EXPOSE 3000
-CMD ["npm", "run", "build"]
+CMD ["npm", "start"]

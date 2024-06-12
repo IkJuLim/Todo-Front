@@ -154,6 +154,7 @@ const Main = () => {
 
   const handleSortByChange = (sortType) => {
     setSortBy(sortType);
+    fetchTodos();
   };
 
   const handleEditClick = (item) => {

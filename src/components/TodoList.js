@@ -12,7 +12,6 @@ const TodoList = ({ items, checkboxEventHandler, handleSortByChange, handleEditC
   const indexOfLastPost = currentPage * pageSize;
   const indexOfFirstPost = indexOfLastPost - pageSize;
   const currentItems = items.slice(indexOfFirstPost, indexOfLastPost);
-  const keyword = localStorage.getItem('keyword');
 
   for(let i = 1; i <= Math.ceil(totalSize / pageSize); i++){
     pageNumbers.push(i);
